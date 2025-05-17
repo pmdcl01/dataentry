@@ -86,7 +86,7 @@ document.getElementById("attendanceForm").addEventListener("submit", function (e
   const formData = new FormData(this);
   formData.append("batch", batch);
 
-  fetch("https://your-infinityfree-domain.com/submit.php", {
+  fetch("https://pmdclasses.infinityfreeapp.com/submit.php", {
     method: "POST",
     body: formData
   })
