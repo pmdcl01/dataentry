@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PMD Attendance Form</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    input[type="text"] { width: 100%; }
+  </style>
+</head>
+<body>
+
+<h2>Attendance Management - PMD</h2>
+
+<label for="batch">Select Batch:</label>
+<select id="batch" onchange="loadStudents()">
+  <option value="">-- Select Batch --</option>
+  <option value="BatchA">Batch A</option>
+  <option value="BatchB">Batch B</option>
+</select>
+
+<div id="attendanceTable" style="display:none;">
+  <form id="attendanceForm">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Remark</th>
+        </tr>
+      </thead>
+      <tbody id="studentsBody"></tbody>
+    </table>
+    <br>
+    <button type="submit">Submit Attendance</button>
+  </form>
+</div>
+
+<script>
+const studentData = {
+  "BatchA": [
+    { id: "A101", name: "Rahul Sharma" },
+    { id: "A102", name: "Priya Verma" }
+  ],
+  "BatchB": [
+    { id: "B201", name: "Amit Kumar" },
+    { id: "B202", name: "Sneha Singh" }
+  ]
+};
+
+function loadStudents() {
+  const batch = document.getElementById("batch").value;
+  const studentsBody = document.getElementById("studentsBody");
+  studentsBody.innerHTML = "";
+  if (!batch) {
+    document.getElementById("attendanceTable").style.display = "none";
+    return;
+  }
+
+  studentData[batch].forEach((student, index) => {
+    const row = `
+      <tr>
+        <td>${student.id}<input type="hidden" name="students[${index}][id]" value="${student.id}"></td>
+        <td>${student.name}<input type="hidden" name="students[${index}][name]" value="${student.name}"></td>
+        <td>
+          <label><input type="radio" name="students[${index}][status]" value="Present" required> P</label>
+          <label><input type="radio" name="students[${index}][status]" value="Absent"> A</label>
+          <label><input type="radio" name="students[${index}][status]" value="Leave"> L</label>
+          <label><input type="radio" name="students[${index}][status]" value="Holiday"> H</label>
+          <label><input type="radio" name="students[${index}][status]" value="Weekly Off"> W</label>
+        </td>
+        <td><input type="text" name="students[${index}][remark]"></td>
+      </tr>`;
+    studentsBody.innerHTML += row;
+  });
+
+  document.getElementById("attendanceTable").style.display = "block";
+}
+
+document.getElementById("attendanceForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const batch = document.getElementById("batch").value;
+  const formData = new FormData(this);
+  formData.append("batch", batch);
+
+  fetch("https://your-infinityfree-domain.com/submit.php", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.text())
+  .then(msg => alert(msg))
+  .catch(err => alert("Error submitting attendance"));
+});
+</script>
+
+</body>
+</html>
